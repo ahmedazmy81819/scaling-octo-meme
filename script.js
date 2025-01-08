@@ -1,6 +1,6 @@
 // تهيئة Supabase
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_KEY';
+const supabaseUrl = 'https://bbwtxrlnavwguregkjqo.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJid3R4cmxuYXZ3Z3VyZWdranFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYzNDkzODMsImV4cCI6MjA1MTkyNTM4M30.gAABNCXAIQqEETOEoJbAB_ySwnIdv_I-c5thPFjvYwY';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 document.addEventListener('DOMContentLoaded', function () {
