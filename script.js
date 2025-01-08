@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const usernameInput = document.getElementById('username');
     const loginBtn = document.getElementById('loginBtn');
     const songForm = document.getElementById('songForm');
+    const addSongBtn = document.getElementById('addSongBtn');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressBar = document.getElementById('progressBar');
     const playlist = document.getElementById('playlist');
 
     let currentUser = localStorage.getItem('currentUser');
@@ -49,7 +53,22 @@ document.addEventListener('DOMContentLoaded', function () {
         const songFile = document.getElementById('songFile').files[0];
 
         if (songName && artistName && songFile) {
+            // إخفاء زر الإضافة وإظهار عداد التحميل
+            addSongBtn.classList.add('hidden');
+            uploadProgress.classList.remove('hidden');
+
             const reader = new FileReader();
+
+            // تحديث عداد التحميل
+            reader.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    const percentLoaded = Math.round((e.loaded / e.total) * 100);
+                    progressPercent.textContent = `${percentLoaded}%`;
+                    progressBar.value = percentLoaded;
+                }
+            };
+
+            // عند اكتمال التحميل
             reader.onload = function (e) {
                 const song = {
                     id: Date.now(),
@@ -66,7 +85,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 // إضافة الأغنية إلى DOM
                 addSongToDOM(song);
                 songForm.reset();
+
+                // إعادة إظهار زر الإضافة وإخفاء عداد التحميل
+                addSongBtn.classList.remove('hidden');
+                uploadProgress.classList.add('hidden');
+                progressPercent.textContent = '0%';
+                progressBar.value = 0;
             };
+
             reader.readAsDataURL(songFile);
         }
     });
