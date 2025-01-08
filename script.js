@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const loggedInUser = document.getElementById('loggedInUser');
     const usernameInput = document.getElementById('username');
     const loginBtn = document.getElementById('loginBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const logoutBtn = document.getElementById('logoutBtn');
     const searchUser = document.getElementById('searchUser');
     const searchBtn = document.getElementById('searchBtn');
     const userPlaylists = document.getElementById('userPlaylists');
@@ -38,23 +40,33 @@ document.addEventListener('DOMContentLoaded', function () {
     loginBtn.addEventListener('click', function () {
         const username = usernameInput.value.trim();
         if (username) {
-            currentUser = username;
-            localStorage.setItem('currentUser', currentUser);
-
-            if (!users[currentUser]) {
+            if (users[username]) {
+                errorMsg.classList.remove('hidden');
+            } else {
+                errorMsg.classList.add('hidden');
+                currentUser = username;
+                localStorage.setItem('currentUser', currentUser);
                 users[currentUser] = [];
                 localStorage.setItem('users', JSON.stringify(users));
+                loadUI();
             }
-
-            loadUI();
         }
+    });
+
+    // تسجيل الخروج
+    logoutBtn.addEventListener('click', function () {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        loadUI();
     });
 
     // بحث عن مستخدم
     searchBtn.addEventListener('click', function () {
-        const username = searchUser.value.trim();
-        if (username && users[username]) {
-            displayUserPlaylist(username);
+        const username = searchUser.value.trim().toLowerCase(); // تحويل النص إلى أحرف صغيرة
+        const foundUser = Object.keys(users).find(user => user.toLowerCase() === username); // البحث غير الحساس لحالة الأحرف
+
+        if (foundUser) {
+            displayUserPlaylist(foundUser);
         } else {
             userPlaylists.innerHTML = '<p>المستخدم غير موجود!</p>';
         }
