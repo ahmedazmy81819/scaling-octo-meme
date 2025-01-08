@@ -5,30 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>قائمة التشغيل المشتركة</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>قائمة التشغيل المشتركة</h1>
+        <h1 class="animate__animated animate__fadeInDown">قائمة التشغيل المشتركة</h1>
         
         <!-- تسجيل الدخول -->
-        <div id="loginSection">
-            <p>أدخل اسمك للبدء:</p>
-            <input type="text" id="username" placeholder="اسمك">
-            <button id="loginBtn">ابدأ</button>
-            <p id="errorMsg" class="hidden" style="color: red;">هذا الاسم موجود مسبقًا!</p>
+        <div id="loginSection" class="animate__animated animate__fadeIn">
+            <p>أدخل اسمك وكلمة السر للبدء:</p>
+            <input type="text" id="username" placeholder="اسم المستخدم">
+            <input type="password" id="password" placeholder="كلمة السر">
+            <button id="loginBtn">تسجيل الدخول</button>
+            <p id="errorMsg" class="hidden" style="color: red;"></p>
         </div>
 
         <!-- استكشاف المستخدمين -->
-        <div id="exploreSection" class="hidden">
-            <p>مرحبًا، <span id="loggedInUser"></span>!</p>
-            <button id="logoutBtn">تسجيل الخروج</button>
+        <div id="exploreSection" class="hidden animate__animated animate__fadeIn">
+            <div class="profile-section">
+                <img id="profileImage" src="https://via.placeholder.com/150" alt="صورة الملف الشخصي">
+                <p>مرحبًا، <span id="loggedInUser"></span>!</p>
+                <button id="logoutBtn">تسجيل الخروج</button>
+                <button id="deleteAccountBtn" class="delete-btn">إزالة الحساب نهائيًا</button>
+                <input type="file" id="profileImageUpload" accept="image/*" class="hidden">
+                <button id="changeProfileImageBtn">تغيير صورة الملف الشخصي</button>
+            </div>
             <input type="text" id="searchUser" placeholder="ابحث عن مستخدم...">
-            <button id="searchBtn">بحث</button>
+            <button id="searchBtn">استكشف الحساب</button>
             <div id="userPlaylists"></div>
         </div>
 
         <!-- إضافة أغنية -->
-        <div id="songSection" class="hidden">
+        <div id="songSection" class="hidden animate__animated animate__fadeIn">
             <form id="songForm">
                 <input type="text" id="songName" placeholder="اسم الأغنية" required>
                 <input type="text" id="artistName" placeholder="اسم الفنان" required>
@@ -39,6 +47,14 @@
                     <progress id="progressBar" value="0" max="100"></progress>
                 </div>
             </form>
+
+            <!-- تسجيل الصوت -->
+            <div id="recordSection">
+                <button id="recordBtn">بدء التسجيل</button>
+                <button id="stopRecordBtn" class="hidden">إيقاف التسجيل</button>
+                <audio id="recordedAudio" controls class="hidden"></audio>
+                <button id="saveRecordBtn" class="hidden">حفظ التسجيل</button>
+            </div>
 
             <!-- عرض قائمة التشغيل -->
             <ul id="playlist"></ul>
