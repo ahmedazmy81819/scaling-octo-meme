@@ -44,6 +44,15 @@ button:hover {
     background-color: #0056b3;
 }
 
+#uploadProgress {
+    margin-top: 10px;
+}
+
+progress {
+    width: 100%;
+    height: 20px;
+}
+
 ul {
     list-style-type: none;
     padding: 0;
