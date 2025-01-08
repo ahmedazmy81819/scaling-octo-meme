@@ -127,21 +127,99 @@ document.addEventListener('DOMContentLoaded', function () {
         if (file) {
             const reader = new FileReader();
             reader.onload = function (e) {
-                // تحديث صورة الملف الشخصي في الواجهة
-                profileImage.src = e.target.result;
+                const img = new Image();
+                img.src = e.target.result;
 
-                // حفظ صورة الملف الشخصي في localStorage
-                users[currentUser].profileImage = e.target.result;
-                localStorage.setItem('users', JSON.stringify(users));
-
-                // إظهار رسالة نجاح
-                errorMsg.textContent = 'تم تغيير صورة الملف الشخصي بنجاح!';
-                errorMsg.style.color = 'green';
-                errorMsg.classList.remove('hidden');
+                img.onload = function () {
+                    if (img.width === 150 && img.height === 150) {
+                        // إذا كانت الصورة متوافقة مع المقاس
+                        saveProfileImage(img.src);
+                    } else {
+                        // إذا كانت الصورة غير متوافقة مع المقاس
+                        openImageCropper(img.src);
+                    }
+                };
             };
             reader.readAsDataURL(file);
         }
     });
+
+    // فتح نافذة تعديل الصورة
+    function openImageCropper(imageSrc) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
+
+        const cropperContainer = document.createElement('div');
+        cropperContainer.style.backgroundColor = '#fff';
+        cropperContainer.style.padding = '20px';
+        cropperContainer.style.borderRadius = '10px';
+        cropperContainer.style.maxWidth = '90%';
+        cropperContainer.style.maxHeight = '90%';
+
+        const img = document.createElement('img');
+        img.src = imageSrc;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '80vh';
+
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.style.marginTop = '10px';
+        buttonsContainer.style.textAlign = 'center';
+
+        const cropBtn = document.createElement('button');
+        cropBtn.textContent = 'قص الصورة';
+        cropBtn.style.marginRight = '10px';
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = 'إلغاء';
+
+        cropperContainer.appendChild(img);
+        buttonsContainer.appendChild(cropBtn);
+        buttonsContainer.appendChild(cancelBtn);
+        cropperContainer.appendChild(buttonsContainer);
+        modal.appendChild(cropperContainer);
+        document.body.appendChild(modal);
+
+        const cropper = new Cropper(img, {
+            aspectRatio: 1, // نسبة 1:1 (مربع)
+            viewMode: 1,
+            autoCropArea: 1,
+        });
+
+        cropBtn.addEventListener('click', function () {
+            const croppedCanvas = cropper.getCroppedCanvas({
+                width: 150,
+                height: 150,
+            });
+            const croppedImage = croppedCanvas.toDataURL('image/png');
+            saveProfileImage(croppedImage);
+            document.body.removeChild(modal);
+        });
+
+        cancelBtn.addEventListener('click', function () {
+            document.body.removeChild(modal);
+        });
+    }
+
+    // حفظ صورة الملف الشخصي
+    function saveProfileImage(imageSrc) {
+        profileImage.src = imageSrc;
+        users[currentUser].profileImage = imageSrc;
+        localStorage.setItem('users', JSON.stringify(users));
+
+        // إظهار رسالة نجاح
+        errorMsg.textContent = 'تم تغيير صورة الملف الشخصي بنجاح!';
+        errorMsg.style.color = 'green';
+        errorMsg.classList.remove('hidden');
+    }
 
     // تحميل صورة الملف الشخصي
     function loadProfileImage(user) {
