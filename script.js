@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     const loginBtn = document.getElementById('loginBtn');
+    const createAccountBtn = document.getElementById('createAccountBtn');
     const errorMsg = document.getElementById('errorMsg');
     const logoutBtn = document.getElementById('logoutBtn');
     const deleteAccountBtn = document.getElementById('deleteAccountBtn');
@@ -72,6 +73,32 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // إنشاء حساب جديد
+    createAccountBtn.addEventListener('click', function () {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (username && password) {
+            if (users[username]) {
+                errorMsg.textContent = 'اسم المستخدم موجود مسبقًا!';
+                errorMsg.classList.remove('hidden');
+            } else {
+                users[username] = {
+                    password: password,
+                    playlist: [],
+                    profileImage: "https://via.placeholder.com/150" // صورة افتراضية
+                };
+                localStorage.setItem('users', JSON.stringify(users));
+                errorMsg.textContent = 'تم إنشاء الحساب بنجاح!';
+                errorMsg.style.color = 'green';
+                errorMsg.classList.remove('hidden');
+            }
+        } else {
+            errorMsg.textContent = 'يرجى إدخال اسم المستخدم وكلمة السر!';
+            errorMsg.classList.remove('hidden');
+        }
+    });
+
     // تسجيل الخروج
     logoutBtn.addEventListener('click', function () {
         currentUser = null;
@@ -100,9 +127,17 @@ document.addEventListener('DOMContentLoaded', function () {
         if (file) {
             const reader = new FileReader();
             reader.onload = function (e) {
+                // تحديث صورة الملف الشخصي في الواجهة
                 profileImage.src = e.target.result;
+
+                // حفظ صورة الملف الشخصي في localStorage
                 users[currentUser].profileImage = e.target.result;
                 localStorage.setItem('users', JSON.stringify(users));
+
+                // إظهار رسالة نجاح
+                errorMsg.textContent = 'تم تغيير صورة الملف الشخصي بنجاح!';
+                errorMsg.style.color = 'green';
+                errorMsg.classList.remove('hidden');
             };
             reader.readAsDataURL(file);
         }
@@ -110,10 +145,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // تحميل صورة الملف الشخصي
     function loadProfileImage(user) {
-        if (users[user].profileImage) {
+        if (users[user] && users[user].profileImage) {
             profileImage.src = users[user].profileImage;
         } else {
-            profileImage.src = "https://via.placeholder.com/150";
+            profileImage.src = "https://via.placeholder.com/150"; // صورة افتراضية
         }
     }
 
