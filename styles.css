@@ -105,3 +105,8 @@ li {
     border-radius: 5px;
     text-align: left;
 }
+
+#logoutBtn {
+    background-color: #dc3545;
+    margin-bottom: 20px;
+}
