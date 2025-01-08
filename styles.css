@@ -21,11 +21,11 @@ h1 {
     color: #007BFF;
 }
 
-form {
-    margin-bottom: 20px;
+.hidden {
+    display: none;
 }
 
-input {
+input, button {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
@@ -34,11 +34,9 @@ input {
 }
 
 button {
-    padding: 10px 20px;
     background-color: #007BFF;
     color: #fff;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
 }
 
@@ -63,17 +61,9 @@ li {
     align-items: center;
 }
 
-.like-btn {
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.like-btn.liked {
-    background-color: #dc3545;
+.audio-player {
+    width: 100%;
+    margin-top: 10px;
 }
 
 .remove-btn {
