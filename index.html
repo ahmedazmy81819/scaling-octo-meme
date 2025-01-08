@@ -9,18 +9,27 @@
 <body>
     <div class="container">
         <h1>قائمة التشغيل المشتركة</h1>
-        <p>أضف أغانيك المفضلة هنا!</p>
         
-        <!-- نموذج إضافة أغنية -->
-        <form id="songForm">
-            <input type="text" id="songName" placeholder="اسم الأغنية" required>
-            <input type="text" id="artistName" placeholder="اسم الفنان" required>
-            <input type="text" id="friendName" placeholder="اسمك" required>
-            <button type="submit">أضف الأغنية</button>
-        </form>
+        <!-- تسجيل الدخول -->
+        <div id="loginSection">
+            <p>أدخل اسمك للبدء:</p>
+            <input type="text" id="username" placeholder="اسمك">
+            <button id="loginBtn">ابدأ</button>
+        </div>
 
-        <!-- عرض قائمة التشغيل -->
-        <ul id="playlist"></ul>
+        <!-- إضافة أغنية -->
+        <div id="songSection" class="hidden">
+            <p>مرحبًا، <span id="loggedInUser"></span>!</p>
+            <form id="songForm">
+                <input type="text" id="songName" placeholder="اسم الأغنية" required>
+                <input type="text" id="artistName" placeholder="اسم الفنان" required>
+                <input type="file" id="songFile" accept="audio/mp3" required>
+                <button type="submit">أضف الأغنية</button>
+            </form>
+
+            <!-- عرض قائمة التشغيل -->
+            <ul id="playlist"></ul>
+        </div>
     </div>
 
     <script src="script.js"></script>
