@@ -1,67 +1,95 @@
 // script.js
 document.addEventListener('DOMContentLoaded', function () {
-    // تحميل القائمة من localStorage عند فتح الصفحة
-    loadPlaylist();
+    const loginSection = document.getElementById('loginSection');
+    const songSection = document.getElementById('songSection');
+    const loggedInUser = document.getElementById('loggedInUser');
+    const usernameInput = document.getElementById('username');
+    const loginBtn = document.getElementById('loginBtn');
+    const songForm = document.getElementById('songForm');
+    const playlist = document.getElementById('playlist');
 
-    // إضافة أغنية جديدة
-    document.getElementById('songForm').addEventListener('submit', function (e) {
+    let currentUser = localStorage.getItem('currentUser');
+    let users = JSON.parse(localStorage.getItem('users')) || {};
+
+    // تحميل واجهة المستخدم بناءً على حالة التسجيل
+    function loadUI() {
+        if (currentUser) {
+            loginSection.classList.add('hidden');
+            songSection.classList.remove('hidden');
+            loggedInUser.textContent = currentUser;
+            loadPlaylist(currentUser);
+        } else {
+            loginSection.classList.remove('hidden');
+            songSection.classList.add('hidden');
+        }
+    }
+
+    // تسجيل الدخول
+    loginBtn.addEventListener('click', function () {
+        const username = usernameInput.value.trim();
+        if (username) {
+            currentUser = username;
+            localStorage.setItem('currentUser', currentUser);
+
+            if (!users[currentUser]) {
+                users[currentUser] = [];
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            loadUI();
+        }
+    });
+
+    // إضافة أغنية
+    songForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
         const songName = document.getElementById('songName').value;
         const artistName = document.getElementById('artistName').value;
-        const friendName = document.getElementById('friendName').value;
+        const songFile = document.getElementById('songFile').files[0];
 
-        if (songName && artistName && friendName) {
-            addSongToPlaylist(songName, artistName, friendName);
-            document.getElementById('songForm').reset();
+        if (songName && artistName && songFile) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const song = {
+                    id: Date.now(),
+                    songName,
+                    artistName,
+                    file: e.target.result,
+                    addedBy: currentUser
+                };
+
+                // إضافة الأغنية إلى قائمة المستخدم
+                users[currentUser].push(song);
+                localStorage.setItem('users', JSON.stringify(users));
+
+                // إضافة الأغنية إلى DOM
+                addSongToDOM(song);
+                songForm.reset();
+            };
+            reader.readAsDataURL(songFile);
         }
     });
 
-    // تحميل القائمة من localStorage
-    function loadPlaylist() {
-        const playlist = JSON.parse(localStorage.getItem('playlist')) || [];
-        playlist.forEach(song => {
+    // تحميل قائمة التشغيل
+    function loadPlaylist(user) {
+        playlist.innerHTML = '';
+        users[user].forEach(song => {
             addSongToDOM(song);
         });
-    }
-
-    // إضافة أغنية إلى القائمة وعرضها
-    function addSongToPlaylist(songName, artistName, friendName) {
-        const song = {
-            id: Date.now(),
-            songName,
-            artistName,
-            friendName,
-            likes: 0
-        };
-
-        // إضافة الأغنية إلى localStorage
-        const playlist = JSON.parse(localStorage.getItem('playlist')) || [];
-        playlist.push(song);
-        localStorage.setItem('playlist', JSON.stringify(playlist));
-
-        // إضافة الأغنية إلى DOM
-        addSongToDOM(song);
     }
 
     // إضافة أغنية إلى DOM
     function addSongToDOM(song) {
         const li = document.createElement('li');
-        li.setAttribute('data-id', song.id);
-
         li.innerHTML = `
-            <span>${song.songName} - ${song.artistName} (مضافة من ${song.friendName})</span>
-            <div>
-                <button class="like-btn">إعجاب (${song.likes})</button>
-                <button class="remove-btn">إزالة</button>
-            </div>
+            <span>${song.songName} - ${song.artistName} (مضافة من ${song.addedBy})</span>
+            <audio class="audio-player" controls>
+                <source src="${song.file}" type="audio/mp3">
+                متصفحك لا يدعم تشغيل الصوتيات.
+            </audio>
+            <button class="remove-btn" data-id="${song.id}">إزالة</button>
         `;
-
-        // إضافة حدث إعجاب
-        const likeBtn = li.querySelector('.like-btn');
-        likeBtn.addEventListener('click', function () {
-            likeSong(song.id);
-        });
 
         // إضافة حدث إزالة
         const removeBtn = li.querySelector('.remove-btn');
@@ -69,38 +97,16 @@ document.addEventListener('DOMContentLoaded', function () {
             removeSong(song.id);
         });
 
-        document.getElementById('playlist').appendChild(li);
+        playlist.appendChild(li);
     }
 
-    // زيادة عدد الإعجابات
-    function likeSong(id) {
-        const playlist = JSON.parse(localStorage.getItem('playlist')) || [];
-        const song = playlist.find(song => song.id === id);
-        if (song) {
-            song.likes += 1;
-            localStorage.setItem('playlist', JSON.stringify(playlist));
-            updateLikesInDOM(id, song.likes);
-        }
-    }
-
-    // تحديث عدد الإعجابات في DOM
-    function updateLikesInDOM(id, likes) {
-        const li = document.querySelector(`li[data-id="${id}"]`);
-        if (li) {
-            const likeBtn = li.querySelector('.like-btn');
-            likeBtn.textContent = `إعجاب (${likes})`;
-        }
-    }
-
-    // إزالة أغنية من القائمة
+    // إزالة أغنية
     function removeSong(id) {
-        let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
-        playlist = playlist.filter(song => song.id !== id);
-        localStorage.setItem('playlist', JSON.stringify(playlist));
-
-        const li = document.querySelector(`li[data-id="${id}"]`);
-        if (li) {
-            li.remove();
-        }
+        users[currentUser] = users[currentUser].filter(song => song.id !== id);
+        localStorage.setItem('users', JSON.stringify(users));
+        loadPlaylist(currentUser);
     }
+
+    // تحميل الواجهة عند فتح الصفحة
+    loadUI();
 });
