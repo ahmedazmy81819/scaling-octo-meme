@@ -17,9 +17,16 @@
             <button id="loginBtn">ابدأ</button>
         </div>
 
+        <!-- استكشاف المستخدمين -->
+        <div id="exploreSection" class="hidden">
+            <p>مرحبًا، <span id="loggedInUser"></span>!</p>
+            <input type="text" id="searchUser" placeholder="ابحث عن مستخدم...">
+            <button id="searchBtn">بحث</button>
+            <div id="userPlaylists"></div>
+        </div>
+
         <!-- إضافة أغنية -->
         <div id="songSection" class="hidden">
-            <p>مرحبًا، <span id="loggedInUser"></span>!</p>
             <form id="songForm">
                 <input type="text" id="songName" placeholder="اسم الأغنية" required>
                 <input type="text" id="artistName" placeholder="اسم الفنان" required>
