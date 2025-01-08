@@ -157,6 +157,12 @@ document.addEventListener('DOMContentLoaded', function () {
         cropperContainer.style.borderRadius = '10px';
         cropperContainer.style.maxWidth = '90%';
         cropperContainer.style.maxHeight = '90%';
+        cropperContainer.style.display = 'flex';
+        cropperContainer.style.flexDirection = 'row'; // ترتيب العناصر أفقيًا
+
+        const imgContainer = document.createElement('div');
+        imgContainer.style.flex = '1'; // يأخذ نصف المساحة
+        imgContainer.style.marginRight = '20px'; // مسافة بين الصورة والأزرار
 
         const img = document.createElement('img');
         img.src = imageSrc;
@@ -164,21 +170,25 @@ document.addEventListener('DOMContentLoaded', function () {
         img.style.maxHeight = '80vh';
 
         const buttonsContainer = document.createElement('div');
-        buttonsContainer.style.marginTop = '10px';
-        buttonsContainer.style.textAlign = 'center';
+        buttonsContainer.style.flex = '1'; // يأخذ نصف المساحة
+        buttonsContainer.style.display = 'flex';
+        buttonsContainer.style.flexDirection = 'column';
+        buttonsContainer.style.justifyContent = 'center';
+        buttonsContainer.style.alignItems = 'center';
 
         const cropBtn = document.createElement('button');
         cropBtn.textContent = 'قص الصورة';
-        cropBtn.style.marginRight = '10px';
+        cropBtn.style.marginBottom = '10px';
         cropBtn.classList.add('crop-btn');
 
         const cancelBtn = document.createElement('button');
         cancelBtn.textContent = 'إلغاء';
         cancelBtn.classList.add('cancel-btn');
 
-        cropperContainer.appendChild(img);
+        imgContainer.appendChild(img);
         buttonsContainer.appendChild(cropBtn);
         buttonsContainer.appendChild(cancelBtn);
+        cropperContainer.appendChild(imgContainer);
         cropperContainer.appendChild(buttonsContainer);
         modal.appendChild(cropperContainer);
         document.body.appendChild(modal);
@@ -254,6 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <source src="${song.file}" type="audio/mp3">
                     متصفحك لا يدعم تشغيل الصوتيات.
                 </audio>
+                <button class="share-btn" data-file="${song.file}">مشاركة على واتساب</button>
             `;
             playlistDiv.appendChild(songDiv);
         });
@@ -373,11 +384,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 متصفحك لا يدعم تشغيل الصوتيات.
             </audio>
             <button class="remove-btn" data-id="${song.id}">إزالة</button>
+            <button class="share-btn" data-file="${song.file}">مشاركة على واتساب</button>
         `;
 
         const removeBtn = li.querySelector('.remove-btn');
         removeBtn.addEventListener('click', function () {
             removeSong(song.id);
+        });
+
+        const shareBtn = li.querySelector('.share-btn');
+        shareBtn.addEventListener('click', function () {
+            shareOnWhatsApp(song.file);
         });
 
         playlist.appendChild(li);
@@ -388,6 +405,14 @@ document.addEventListener('DOMContentLoaded', function () {
         users[currentUser].playlist = users[currentUser].playlist.filter(song => song.id !== id);
         localStorage.setItem('users', JSON.stringify(users));
         loadPlaylist(currentUser);
+    }
+
+    // مشاركة على واتساب
+    function shareOnWhatsApp(fileUrl) {
+        const message = `استمع إلى هذا الملف الصوتي: ${fileUrl}`;
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
     }
 
     // تحميل الواجهة عند فتح الصفحة
