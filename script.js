@@ -126,114 +126,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (file) {
             const reader = new FileReader();
             reader.onload = function (e) {
-                const img = new Image();
-                img.src = e.target.result;
-
-                img.onload = function () {
-                    openImageCropper(img.src);
-                };
+                profileImage.src = e.target.result;
+                users[currentUser].profileImage = e.target.result;
+                localStorage.setItem('users', JSON.stringify(users));
             };
             reader.readAsDataURL(file);
         }
     });
-
-    // فتح نافذة تعديل الصورة
-    function openImageCropper(imageSrc) {
-        const modal = document.createElement('div');
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        modal.style.display = 'flex';
-        modal.style.justifyContent = 'center';
-        modal.style.alignItems = 'center';
-        modal.style.zIndex = '1000';
-
-        const cropperContainer = document.createElement('div');
-        cropperContainer.style.backgroundColor = '#fff';
-        cropperContainer.style.padding = '20px';
-        cropperContainer.style.borderRadius = '10px';
-        cropperContainer.style.maxWidth = '90%';
-        cropperContainer.style.maxHeight = '90%';
-        cropperContainer.style.display = 'flex';
-        cropperContainer.style.flexDirection = 'row'; // ترتيب العناصر أفقيًا
-
-        const imgContainer = document.createElement('div');
-        imgContainer.style.flex = '1'; // يأخذ نصف المساحة
-        imgContainer.style.marginRight = '20px'; // مسافة بين الصورة والأزرار
-
-        const img = document.createElement('img');
-        img.src = imageSrc;
-        img.style.maxWidth = '100%';
-        img.style.maxHeight = '80vh';
-
-        const buttonsContainer = document.createElement('div');
-        buttonsContainer.style.flex = '1'; // يأخذ نصف المساحة
-        buttonsContainer.style.display = 'flex';
-        buttonsContainer.style.flexDirection = 'column';
-        buttonsContainer.style.justifyContent = 'center';
-        buttonsContainer.style.alignItems = 'center';
-
-        const cropBtn = document.createElement('button');
-        cropBtn.textContent = 'قص الصورة';
-        cropBtn.style.marginBottom = '10px';
-        cropBtn.classList.add('crop-btn');
-
-        const cancelBtn = document.createElement('button');
-        cancelBtn.textContent = 'إلغاء';
-        cancelBtn.classList.add('cancel-btn');
-
-        imgContainer.appendChild(img);
-        buttonsContainer.appendChild(cropBtn);
-        buttonsContainer.appendChild(cancelBtn);
-        cropperContainer.appendChild(imgContainer);
-        cropperContainer.appendChild(buttonsContainer);
-        modal.appendChild(cropperContainer);
-        document.body.appendChild(modal);
-
-        const cropper = new Cropper(img, {
-            aspectRatio: 1,
-            viewMode: 1,
-            autoCropArea: 1,
-        });
-
-        cropBtn.addEventListener('click', function () {
-            const croppedCanvas = cropper.getCroppedCanvas({
-                width: 150,
-                height: 150,
-            });
-            const croppedImage = croppedCanvas.toDataURL('image/png');
-            saveProfileImage(croppedImage);
-            document.body.removeChild(modal);
-        });
-
-        cancelBtn.addEventListener('click', function () {
-            document.body.removeChild(modal);
-        });
-    }
-
-    // حفظ صورة الملف الشخصي
-    function saveProfileImage(imageSrc) {
-        profileImage.src = imageSrc;
-        users[currentUser].profileImage = imageSrc;
-        localStorage.setItem('users', JSON.stringify(users));
-
-        // إظهار رسالة نجاح
-        errorMsg.textContent = 'تم تغيير صورة الملف الشخصي بنجاح!';
-        errorMsg.style.color = 'green';
-        errorMsg.classList.remove('hidden');
-    }
-
-    // تحميل صورة الملف الشخصي
-    function loadProfileImage(user) {
-        if (users[user] && users[user].profileImage) {
-            profileImage.src = users[user].profileImage;
-        } else {
-            profileImage.src = "https://via.placeholder.com/150"; // صورة افتراضية
-        }
-    }
 
     // بحث عن مستخدم
     searchBtn.addEventListener('click', function () {
@@ -264,11 +163,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     <source src="${song.file}" type="audio/mp3">
                     متصفحك لا يدعم تشغيل الصوتيات.
                 </audio>
-                <button class="share-btn" data-file="${song.file}">مشاركة على واتساب</button>
+                <button class="share-btn" data-file="${song.file}" data-songname="${song.songName}">مشاركة على واتساب</button>
             `;
             playlistDiv.appendChild(songDiv);
         });
         userPlaylists.appendChild(playlistDiv);
+
+        // إضافة حدث مشاركة على واتساب
+        const shareButtons = document.querySelectorAll('.share-btn');
+        shareButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const fileUrl = button.getAttribute('data-file');
+                const songName = button.getAttribute('data-songname');
+                shareOnWhatsApp(fileUrl, songName);
+            });
+        });
     }
 
     // إضافة أغنية
@@ -384,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 متصفحك لا يدعم تشغيل الصوتيات.
             </audio>
             <button class="remove-btn" data-id="${song.id}">إزالة</button>
-            <button class="share-btn" data-file="${song.file}">مشاركة على واتساب</button>
+            <button class="share-btn" data-file="${song.file}" data-songname="${song.songName}">مشاركة على واتساب</button>
         `;
 
         const removeBtn = li.querySelector('.remove-btn');
@@ -394,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const shareBtn = li.querySelector('.share-btn');
         shareBtn.addEventListener('click', function () {
-            shareOnWhatsApp(song.file);
+            shareOnWhatsApp(song.file, song.songName);
         });
 
         playlist.appendChild(li);
@@ -408,8 +317,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // مشاركة على واتساب
-    function shareOnWhatsApp(fileUrl) {
-        const message = `استمع إلى هذا الملف الصوتي: ${fileUrl}`;
+    function shareOnWhatsApp(fileUrl, songName) {
+        // تنزيل الملف تلقائيًا
+        const downloadLink = document.createElement('a');
+        downloadLink.href = fileUrl;
+        downloadLink.download = `${songName}.mp3`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        // فتح واتساب مع رسالة
+        const message = `استمع إلى هذا الملف الصوتي: ${songName}.mp3`;
         const encodedMessage = encodeURIComponent(message);
         const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
         window.open(whatsappUrl, '_blank');
