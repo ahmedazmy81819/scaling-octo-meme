@@ -111,6 +111,21 @@ li:hover {
     font-size: 12px;
 }
 
+.share-btn {
+    background-color: #25D366; /* لون واتساب */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.share-btn:hover {
+    background-color: #128C7E; /* لون واتساب عند التحويم */
+}
+
 #exploreSection {
     margin-top: 20px;
 }
