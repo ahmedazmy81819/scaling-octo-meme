@@ -73,6 +73,10 @@ li {
 .audio-player {
     width: 100%;
     margin-top: 10px;
+    background-color: #007BFF;
+    border-radius: 5px;
+    padding: 10px;
+    color: #fff;
 }
 
 .remove-btn {
@@ -82,4 +86,22 @@ li {
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 12px;
+}
+
+#exploreSection {
+    margin-top: 20px;
+}
+
+#userPlaylists {
+    margin-top: 20px;
+}
+
+.user-playlist {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: left;
 }
