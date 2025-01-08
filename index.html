@@ -15,11 +15,13 @@
             <p>أدخل اسمك للبدء:</p>
             <input type="text" id="username" placeholder="اسمك">
             <button id="loginBtn">ابدأ</button>
+            <p id="errorMsg" class="hidden" style="color: red;">هذا الاسم موجود مسبقًا!</p>
         </div>
 
         <!-- استكشاف المستخدمين -->
         <div id="exploreSection" class="hidden">
             <p>مرحبًا، <span id="loggedInUser"></span>!</p>
+            <button id="logoutBtn">تسجيل الخروج</button>
             <input type="text" id="searchUser" placeholder="ابحث عن مستخدم...">
             <button id="searchBtn">بحث</button>
             <div id="userPlaylists"></div>
