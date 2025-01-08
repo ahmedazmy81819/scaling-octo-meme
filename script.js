@@ -173,22 +173,33 @@ document.addEventListener('DOMContentLoaded', function () {
                     addedBy: currentUser
                 };
 
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from('users')
-                    .update({ playlist: [...users[currentUser].playlist, song] })
+                    .select('playlist')
                     .eq('username', currentUser);
 
                 if (error) {
                     errorMsg.textContent = 'حدث خطأ أثناء إضافة الأغنية!';
                     errorMsg.classList.remove('hidden');
                 } else {
-                    addSongToDOM(song);
-                    songForm.reset();
+                    const updatedPlaylist = [...data[0].playlist, song];
+                    const { error } = await supabase
+                        .from('users')
+                        .update({ playlist: updatedPlaylist })
+                        .eq('username', currentUser);
 
-                    addSongBtn.classList.remove('hidden');
-                    uploadProgress.classList.add('hidden');
-                    progressPercent.textContent = '0%';
-                    progressBar.value = 0;
+                    if (error) {
+                        errorMsg.textContent = 'حدث خطأ أثناء إضافة الأغنية!';
+                        errorMsg.classList.remove('hidden');
+                    } else {
+                        addSongToDOM(song);
+                        songForm.reset();
+
+                        addSongBtn.classList.remove('hidden');
+                        uploadProgress.classList.add('hidden');
+                        progressPercent.textContent = '0%';
+                        progressBar.value = 0;
+                    }
                 }
             };
 
