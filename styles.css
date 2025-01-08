@@ -167,30 +167,3 @@ li:hover {
 #changeProfileImageBtn:hover {
     background-color: #218838;
 }
-
-.crop-btn {
-    background-color: #007BFF;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 10px;
-}
-
-.crop-btn:hover {
-    background-color: #0056b3;
-}
-
-.cancel-btn {
-    background-color: #dc3545;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.cancel-btn:hover {
-    background-color: #c82333;
-}
