@@ -1,4 +1,3 @@
-// script.js
 document.addEventListener('DOMContentLoaded', function () {
     const loginSection = document.getElementById('loginSection');
     const exploreSection = document.getElementById('exploreSection');
@@ -131,13 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 img.src = e.target.result;
 
                 img.onload = function () {
-                    if (img.width === 150 && img.height === 150) {
-                        // إذا كانت الصورة متوافقة مع المقاس
-                        saveProfileImage(img.src);
-                    } else {
-                        // إذا كانت الصورة غير متوافقة مع المقاس
-                        openImageCropper(img.src);
-                    }
+                    openImageCropper(img.src);
                 };
             };
             reader.readAsDataURL(file);
@@ -177,9 +170,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const cropBtn = document.createElement('button');
         cropBtn.textContent = 'قص الصورة';
         cropBtn.style.marginRight = '10px';
+        cropBtn.classList.add('crop-btn');
 
         const cancelBtn = document.createElement('button');
         cancelBtn.textContent = 'إلغاء';
+        cancelBtn.classList.add('cancel-btn');
 
         cropperContainer.appendChild(img);
         buttonsContainer.appendChild(cropBtn);
@@ -189,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.appendChild(modal);
 
         const cropper = new Cropper(img, {
-            aspectRatio: 1, // نسبة 1:1 (مربع)
+            aspectRatio: 1,
             viewMode: 1,
             autoCropArea: 1,
         });
