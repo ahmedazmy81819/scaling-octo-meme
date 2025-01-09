@@ -19,17 +19,17 @@
             <input type="password" id="password" placeholder="كلمة السر">
             <button id="loginBtn">تسجيل الدخول</button>
             <button id="createAccountBtn">إنشاء حساب جديد</button>
-            <p id="errorMsg" class="hidden" style="color: red;"></p>
+            <p id="errorMsg" style="color: red;"></p>
         </div>
 
         <!-- استكشاف المستخدمين -->
-        <div id="exploreSection" class="hidden animate__animated animate__fadeIn">
+        <div id="exploreSection" class="animate__animated animate__fadeIn">
             <div class="profile-section">
                 <img id="profileImage" src="https://via.placeholder.com/150" alt="صورة الملف الشخصي">
                 <p>مرحبًا، <span id="loggedInUser"></span>!</p>
                 <button id="logoutBtn">تسجيل الخروج</button>
                 <button id="deleteAccountBtn" class="delete-btn">إزالة الحساب نهائيًا</button>
-                <input type="file" id="profileImageUpload" accept="image/*" class="hidden">
+                <input type="file" id="profileImageUpload" accept="image/*">
                 <button id="changeProfileImageBtn">تغيير صورة الملف الشخصي</button>
             </div>
             <input type="text" id="searchUser" placeholder="ابحث عن مستخدم...">
@@ -38,13 +38,13 @@
         </div>
 
         <!-- إضافة أغنية -->
-        <div id="songSection" class="hidden animate__animated animate__fadeIn">
+        <div id="songSection" class="animate__animated animate__fadeIn">
             <form id="songForm">
                 <input type="text" id="songName" placeholder="اسم الأغنية" required>
                 <input type="text" id="artistName" placeholder="اسم الفنان" required>
                 <input type="file" id="songFile" accept="audio/mp3" required>
                 <button type="submit" id="addSongBtn">أضف الأغنية</button>
-                <div id="uploadProgress" class="hidden">
+                <div id="uploadProgress">
                     <p>جاري رفع الملف: <span id="progressPercent">0%</span></p>
                     <progress id="progressBar" value="0" max="100"></progress>
                 </div>
@@ -53,9 +53,9 @@
             <!-- تسجيل الصوت -->
             <div id="recordSection">
                 <button id="recordBtn">بدء التسجيل</button>
-                <button id="stopRecordBtn" class="hidden">إيقاف التسجيل</button>
-                <audio id="recordedAudio" controls class="hidden"></audio>
-                <button id="saveRecordBtn" class="hidden">حفظ التسجيل</button>
+                <button id="stopRecordBtn">إيقاف التسجيل</button>
+                <audio id="recordedAudio" controls></audio>
+                <button id="saveRecordBtn">حفظ التسجيل</button>
             </div>
 
             <!-- عرض قائمة التشغيل -->
