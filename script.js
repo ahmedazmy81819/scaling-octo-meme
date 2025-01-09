@@ -55,16 +55,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // تحميل واجهة المستخدم بناءً على حالة التسجيل
     function loadUI() {
         if (currentUser) {
-            loginSection.classList.add('hidden');
-            exploreSection.classList.remove('hidden');
-            songSection.classList.remove('hidden');
             loggedInUser.textContent = currentUser;
             loadPlaylist(currentUser);
             loadProfileImage(currentUser);
-        } else {
-            loginSection.classList.remove('hidden');
-            exploreSection.classList.add('hidden');
-            songSection.classList.add('hidden');
         }
     }
 
@@ -153,6 +146,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const reader = new FileReader();
             reader.onload = async function (e) {
                 profileImage.src = e.target.result;
+
+                // حفظ الصورة الجديدة في Firestore
                 const userRef = firestore.collection('users').doc(currentUser);
                 await userRef.update({ profileImage: e.target.result });
             };
@@ -239,6 +234,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     addedBy: currentUser
                 };
 
+                // حفظ الأغنية الجديدة في Firestore
                 const userRef = firestore.collection('users').doc(currentUser);
                 await userRef.update({
                     playlist: firebase.firestore.FieldValue.arrayUnion(song)
@@ -295,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedBy: currentUser
             };
 
+            // حفظ التسجيل الصوتي في Firestore
             const userRef = firestore.collection('users').doc(currentUser);
             await userRef.update({
                 playlist: firebase.firestore.FieldValue.arrayUnion(song)
