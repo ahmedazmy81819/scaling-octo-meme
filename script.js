@@ -1,4 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // قيم التهيئة من Firebase Console
+    const firebaseConfig = {
+        apiKey: "AIzaSyCqrOEEPsF0OeypD_p6xD5cwr16sEo0bLg",
+        authDomain: "music-for-us-f78f6.firebaseapp.com",
+        databaseURL: "https://music-for-us-f78f6-default-rtdb.firebaseio.com",
+        projectId: "music-for-us-f78f6",
+        storageBucket: "music-for-us-f78f6.firebasestorage.app",
+        messagingSenderId: "963497398495",
+        appId: "1:963497398495:web:794b36a129a61d4ea1196a",
+        measurementId: "G-F1HV38GFY0"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // تهيئة الخدمات الإضافية
+    const firestore = firebase.firestore(); // لـ Firestore
+    const auth = firebase.auth();           // لـ Authentication
+    const storage = firebase.storage();     // لـ Storage
+
+    // عناصر DOM
     const loginSection = document.getElementById('loginSection');
     const exploreSection = document.getElementById('exploreSection');
     const songSection = document.getElementById('songSection');
