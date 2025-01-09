@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const changeProfileImageBtn = document.getElementById('changeProfileImageBtn');
 
     let currentUser = localStorage.getItem('currentUser');
-    let users = JSON.parse(localStorage.getItem('users')) || {};
     let mediaRecorder;
     let audioChunks = [];
 
@@ -70,21 +69,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // تسجيل الدخول
-    loginBtn.addEventListener('click', function () {
+    loginBtn.addEventListener('click', async function () {
         const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
 
         if (username && password) {
-            if (users[username] && users[username].password === password) {
-                errorMsg.classList.add('hidden');
+            const userRef = firestore.collection('users').doc(username);
+            const doc = await userRef.get();
+
+            if (doc.exists && doc.data().password === password) {
+                errorMsg.textContent = 'تم تسجيل الدخول بنجاح!';
+                errorMsg.style.color = 'green';
+                errorMsg.classList.remove('hidden');
                 currentUser = username;
                 localStorage.setItem('currentUser', currentUser);
                 loadUI();
-            } else if (users[username]) {
-                errorMsg.textContent = 'كلمة السر غير صحيحة!';
-                errorMsg.classList.remove('hidden');
             } else {
-                errorMsg.textContent = 'اسم المستخدم غير موجود!';
+                errorMsg.textContent = 'اسم المستخدم أو كلمة السر غير صحيحة!';
+                errorMsg.style.color = 'red';
                 errorMsg.classList.remove('hidden');
             }
         } else {
@@ -94,21 +96,24 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // إنشاء حساب جديد
-    createAccountBtn.addEventListener('click', function () {
+    createAccountBtn.addEventListener('click', async function () {
         const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
 
         if (username && password) {
-            if (users[username]) {
+            const userRef = firestore.collection('users').doc(username);
+            const doc = await userRef.get();
+
+            if (doc.exists) {
                 errorMsg.textContent = 'اسم المستخدم موجود مسبقًا!';
                 errorMsg.classList.remove('hidden');
             } else {
-                users[username] = {
+                await userRef.set({
+                    username: username,
                     password: password,
                     playlist: [],
-                    profileImage: "https://via.placeholder.com/150" // صورة افتراضية
-                };
-                localStorage.setItem('users', JSON.stringify(users));
+                    profileImage: "https://via.placeholder.com/150"
+                });
                 errorMsg.textContent = 'تم إنشاء الحساب بنجاح!';
                 errorMsg.style.color = 'green';
                 errorMsg.classList.remove('hidden');
@@ -127,10 +132,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // حذف الحساب
-    deleteAccountBtn.addEventListener('click', function () {
+    deleteAccountBtn.addEventListener('click', async function () {
         if (confirm('هل أنت متأكد أنك تريد حذف حسابك نهائيًا؟')) {
-            delete users[currentUser];
-            localStorage.setItem('users', JSON.stringify(users));
+            const userRef = firestore.collection('users').doc(currentUser);
+            await userRef.delete();
             currentUser = null;
             localStorage.removeItem('currentUser');
             loadUI();
@@ -142,41 +147,43 @@ document.addEventListener('DOMContentLoaded', function () {
         profileImageUpload.click();
     });
 
-    profileImageUpload.addEventListener('change', function () {
+    profileImageUpload.addEventListener('change', async function () {
         const file = profileImageUpload.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = async function (e) {
                 profileImage.src = e.target.result;
-                users[currentUser].profileImage = e.target.result;
-                localStorage.setItem('users', JSON.stringify(users));
+                const userRef = firestore.collection('users').doc(currentUser);
+                await userRef.update({ profileImage: e.target.result });
             };
             reader.readAsDataURL(file);
         }
     });
 
     // بحث عن مستخدم
-    searchBtn.addEventListener('click', function () {
+    searchBtn.addEventListener('click', async function () {
         const username = searchUser.value.trim().toLowerCase();
-        const foundUser = Object.keys(users).find(user => user.toLowerCase() === username);
+        const userRef = firestore.collection('users').doc(username);
+        const doc = await userRef.get();
 
-        if (foundUser) {
-            displayUserPlaylist(foundUser);
+        if (doc.exists) {
+            const userData = doc.data();
+            displayUserPlaylist(userData);
         } else {
             userPlaylists.innerHTML = '<p>المستخدم غير موجود!</p>';
         }
     });
 
     // عرض قائمة تشغيل المستخدم
-    function displayUserPlaylist(username) {
+    function displayUserPlaylist(userData) {
         userPlaylists.innerHTML = '';
         const playlistDiv = document.createElement('div');
         playlistDiv.className = 'user-playlist';
         playlistDiv.innerHTML = `
-            <h3>قائمة تشغيل ${username}</h3>
-            <img src="${users[username].profileImage || 'https://via.placeholder.com/150'}" alt="صورة الملف الشخصي" class="profile-image">
+            <h3>قائمة تشغيل ${userData.username}</h3>
+            <img src="${userData.profileImage || 'https://via.placeholder.com/150'}" alt="صورة الملف الشخصي" class="profile-image">
         `;
-        users[username].playlist.forEach(song => {
+        userData.playlist.forEach(song => {
             const songDiv = document.createElement('div');
             songDiv.innerHTML = `
                 <p>${song.songName} - ${song.artistName}</p>
@@ -202,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // إضافة أغنية
-    songForm.addEventListener('submit', function (e) {
+    songForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const songName = document.getElementById('songName').value;
@@ -223,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             };
 
-            reader.onload = function (e) {
+            reader.onload = async function (e) {
                 const song = {
                     id: Date.now(),
                     songName,
@@ -232,8 +239,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     addedBy: currentUser
                 };
 
-                users[currentUser].playlist.push(song);
-                localStorage.setItem('users', JSON.stringify(users));
+                const userRef = firestore.collection('users').doc(currentUser);
+                await userRef.update({
+                    playlist: firebase.firestore.FieldValue.arrayUnion(song)
+                });
 
                 addSongToDOM(song);
                 songForm.reset();
@@ -275,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
         stopRecordBtn.classList.add('hidden');
     });
 
-    saveRecordBtn.addEventListener('click', function () {
+    saveRecordBtn.addEventListener('click', async function () {
         const songName = prompt('أدخل اسم التسجيل:');
         if (songName) {
             const song = {
@@ -286,8 +295,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedBy: currentUser
             };
 
-            users[currentUser].playlist.push(song);
-            localStorage.setItem('users', JSON.stringify(users));
+            const userRef = firestore.collection('users').doc(currentUser);
+            await userRef.update({
+                playlist: firebase.firestore.FieldValue.arrayUnion(song)
+            });
 
             addSongToDOM(song);
             recordedAudio.classList.add('hidden');
@@ -298,9 +309,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // تحميل قائمة التشغيل
     function loadPlaylist(user) {
-        playlist.innerHTML = '';
-        users[user].playlist.forEach(song => {
-            addSongToDOM(song);
+        const userRef = firestore.collection('users').doc(user);
+        userRef.get().then(doc => {
+            if (doc.exists) {
+                const userData = doc.data();
+                playlist.innerHTML = '';
+                userData.playlist.forEach(song => {
+                    addSongToDOM(song);
+                });
+            }
         });
     }
 
@@ -332,22 +349,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // إزالة أغنية
     function removeSong(id) {
-        users[currentUser].playlist = users[currentUser].playlist.filter(song => song.id !== id);
-        localStorage.setItem('users', JSON.stringify(users));
-        loadPlaylist(currentUser);
+        const userRef = firestore.collection('users').doc(currentUser);
+        userRef.get().then(doc => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const updatedPlaylist = userData.playlist.filter(song => song.id !== id);
+                userRef.update({ playlist: updatedPlaylist }).then(() => {
+                    loadPlaylist(currentUser);
+                });
+            }
+        });
     }
 
     // مشاركة على واتساب
     function shareOnWhatsApp(fileUrl, songName) {
-        // تنزيل الملف تلقائيًا
-        const downloadLink = document.createElement('a');
-        downloadLink.href = fileUrl;
-        downloadLink.download = `${songName}.mp3`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-
-        // فتح واتساب مع رسالة
         const message = `استمع إلى هذا الملف الصوتي: ${songName}.mp3`;
         const encodedMessage = encodeURIComponent(message);
         const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
