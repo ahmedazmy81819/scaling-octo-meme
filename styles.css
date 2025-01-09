@@ -27,10 +27,6 @@ h1 {
     margin-bottom: 20px;
 }
 
-.hidden {
-    display: none;
-}
-
 input, button {
     width: 100%;
     padding: 10px;
